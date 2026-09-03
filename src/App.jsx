@@ -6,12 +6,13 @@ import pokeball from './assets/pokeball.png'
 import PokemonTag from './components/PokemonTag';
 import pokemon151 from './data/pokedexList.jsx'
 import PokemonList from './components/PokemonList.jsx';
+import PokemonImg from './components/PokemonImg.jsx';
 
 function App() {
   const [pokemons, setPokemons] = useState(pokemon151);
   const [centerPokemon, setCenterPokemon] = useState(0);
-  const [pokemonImage, setPokemonImage] = useState(null);
   const [itemHeight, setItemHeigth] = useState(0);
+  const [pokemon, setPokemon] = useState(pokemons[0]);
 
   const itemRefs = useRef([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -23,13 +24,24 @@ function App() {
     const ItemHeigth = window.getComputedStyle(element)
     setItemHeigth(Number(ItemHeigth.height.replace('px', '')))
   }, [element])
-  
+
+  useEffect(() => {
+    setSelectedIndex(0);
+    setCenterPokemon(0);
+    itemRefs.current[0]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  } ,[]);
+
   const scrollToItem = (index) => {
-    setCenterPokemon(index)
+    setSelectedIndex(index);
+    setCenterPokemon(index);
     itemRefs.current[index]?.scrollIntoView({
       behavior: "smooth",
       block: "center",
     });
+    fetchPokemon(pokemons[index].name)
   };
   const moveSelection = (direction) => {
     setSelectedIndex((currentIndex) => {
@@ -43,28 +55,19 @@ function App() {
       }
 
       // scrollToItem(currentIndex);
-      scrollToItem(newIndex);
+      scrollToItem(direction + selectedIndex);
       setCenterPokemon(newIndex)
       return newIndex;
     });
   };
-  console.log(centerPokemon)
 
   return (
     <div className="h-screen w-screen bg-red-50 flex">
-
-      {/* LEFT - Pokemon Image */}
-      <div className="flex-1 h-screen bg-blue-400 flex justify-center items-center">
-        <div className="w-1/4 bg-red-500">
-          <img
-            className="w-full"
-            src={pokemonImage?.sprites.front_default ?? pokeball}
-            alt=""
-          />
-        </div>
+      <div className='w-full'>
+        <PokemonImg
+        sprite={''}
+      />
       </div>
-
-      {/* RIGHT - Pokemon Picker */}
       <div className="w-80 h-screen flex items-center">
 
         {/* Pokemon List */}
@@ -80,7 +83,6 @@ function App() {
               key={pokemon.id}
               ref={(element) => {
                 itemRefs.current[index] = element;
-                console.log(itemRefs[index])
               }}
               onClick={() => scrollToItem(index)}
               className={`
@@ -121,7 +123,6 @@ function App() {
 
       </div>
       <div className="h-screen w-20 flex flex-col justify-center items-center gap-4">
-
           <button
             className="py-2 px-4 bg-blue-500 text-white rounded"
             onClick={() => moveSelection(-1)}
@@ -135,8 +136,7 @@ function App() {
           >
             Down
           </button>
-
-        </div>
+      </div>
     </div>
   )
 }

@@ -7,7 +7,6 @@ async function fetchPokemon(pokemon) {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.log(pokemon)
         return error;
     }
 }

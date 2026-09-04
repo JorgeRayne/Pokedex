@@ -1,48 +1,64 @@
-import { Virtuoso } from "react-virtuoso";
-import PokemonTag from "./PokemonTag";
+import { useState, useEffect, useRef } from "react";
+import pokemons from '../data/pokedexList.jsx';
+import fetchPokemon from "../api/fetchPokemon.jsx";
 
-function PokemonList({ pokemons, setCenterPokemon }) {
+function PokemonList({ setCenterPokemon, setSelectedIndex, setPokemon }) {
+    const pokemon151 = pokemons
+    const [itemHeight, setItemHeigth] = useState(0);
+    const itemRefs = useRef([]);
+    // const element = itemRefs.current[0];
 
-    const ITEM_HEIGHT = 92;
-    const VIEWPORT_HEIGHT = 800;
-    return (
-        <Virtuoso
-        style={{  height: '100vh', width:600}}
-        totalCount={pokemons.length}
-        rangeChanged={(range) => {
-            const centerIndex = Math.floor((range.startIndex + range.endIndex) / 2);
-            console.log(pokemons.filter(pokemon => pokemon.id == centerIndex))
-            setCenterPokemon(centerIndex)
-        }}
-        components={{
-            Header: () => (
-            <div
-                style={{
-                height: (VIEWPORT_HEIGHT - ITEM_HEIGHT) / 2,
-                }}
-            />
-            ),
-            Footer: () => (
-            <div
-                style={{
-                height: (VIEWPORT_HEIGHT - ITEM_HEIGHT) / 2,
-                }}
-            />
-            ),
-        }}
-        itemContent={(index) => {
-            const p = pokemons[index];
+    useEffect(() => {
+        setSelectedIndex(0);
+        setCenterPokemon(0);
+        itemRefs.current[0]?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+        });
+    } ,[]);
 
-            return (
-            //   <div className="p-3 border-b">
-            //     #{p.id} - {p.name}
-            //   </div>
-            <PokemonTag
-                pokemon={p}
-            />
-            );
-        }}
-        />
+    const scrollToItem = (index) => {
+        setSelectedIndex(index);
+        setCenterPokemon(index);
+        itemRefs.current[index]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        });
+        fetchPokemon(pokemons[index].name)
+    };
+    
+    
+    return(
+        <>
+            <div style={{
+                height: `calc(50vh - ${itemHeight ? itemHeight / 2 : 24}px)`,
+            }} />
+
+            <div className="flex justify-center items-center flex-col gap-2">
+                {pokemon151.map((pokemon, index) => (
+                    <div
+                    key={pokemon.id}
+                    ref={(element) => {
+                        itemRefs.current[index] = element;
+                    }}
+                    onClick={() => scrollToItem(index)}
+                    className={`
+                        w-full
+                        h-24
+                        flex
+                        items-center
+                        justify-center
+                        cursor-pointer
+                        border-2
+                        border-gray-300
+                    `}
+                    >
+                    #{pokemon.id} {pokemon.name}
+                    </div>
+                ))}
+            </div>
+            <div className="h-[50vh]" />
+        </>
     );
 }
 

@@ -1,20 +1,14 @@
 import React, { useState } from 'react'
-import pokeball from '../assets/pokeball.png'
 
-function PokemonImg({ sprite }) {
-    const [pokemonSprite, setPokemonSprite] = useState(pokeball);
-
-    useState(() => {
-        setPokemonSprite(sprite ? sprite : pokeball)
-    }, [sprite]);
+function PokemonImg({ sprite }) { 
 
     return (
-        <div className="flex-1 h-screen bg-blue-400 flex justify-center items-center">
-            <div className="w-1/4 bg-red-500">
+        <div className="flex-1 h-fulll bg-blue-400 flex justify-center items-center">
+            <div className="">
                 <img
-                className="w-full"
-                src={pokemonSprite}
-                alt=""
+                    className="w-full"
+                    src={sprite}
+                    alt='Image of An Pokemon'
                 />
             </div>
         </div>
